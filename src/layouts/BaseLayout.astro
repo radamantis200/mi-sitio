@@ -1,6 +1,6 @@
 ---
+import HeadScript from "@/partials/HeadScript.astro";
 import "@/styles/global.css";
-const { children } = Astro.props;
 const year = new Date().getFullYear();
 ---
 
@@ -9,6 +9,7 @@ const year = new Date().getFullYear();
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Jefry Sánchez</title>
+        <HeadScript />
     </head>
     <body class="bg-white text-gray-900">
         <header class="p-6 text-xl font-semibold">Jefry Sánchez</header>
