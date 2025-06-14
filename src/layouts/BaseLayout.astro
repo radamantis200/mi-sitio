@@ -1,6 +1,7 @@
 ---
 import "@/styles/global.css";
-const { title = "Jefry Sánchez", children } = Astro.props;
+import HeadScript from "@/partials/HeadScript.astro";
+const { title = "Jefry Sánchez" } = Astro.props;
 ---
 
 <html lang="es">
@@ -9,6 +10,7 @@ const { title = "Jefry Sánchez", children } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content="Sitio web personal de Jefry Francisco Sánchez Mora, desarrollador frontend especializado en tecnologías modernas como Astro.js, React.js y más.">
+       <HeadScript />
   </head>
   <body class="bg-white text-gray-900 font-sans">
     <header class="p-6 text-xl font-semibold border-b border-gray-200">
