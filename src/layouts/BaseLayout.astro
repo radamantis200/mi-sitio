@@ -1,42 +1,26 @@
 ---
-import HeadScript from "@/partials/HeadScript.astro";
 import "@/styles/global.css";
-const year = new Date().getFullYear();
+const { title = "Jefry Sánchez", children } = Astro.props;
 ---
 
 <html lang="es">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Jefry Sánchez – Desarrollador Frontend</title>
-        <meta
-            name="description"
-            content="Portafolio de Jefry Francisco Sánchez Mora, ingeniero en sistemas con más de 4 años de experiencia en desarrollo frontend usando tecnologías como React.js, Next.js y Astro.js."
-        />
-        <meta property="og:type" content="website" />
-        <meta
-            property="og:title"
-            content="Jefry Sánchez – Desarrollador Frontend"
-        />
-        <meta
-            property="og:description"
-            content="Ingeniero en sistemas con más de 4 años de experiencia en desarrollo frontend. Trabajo con tecnologías modernas como React.js, Next.js y Astro.js."
-        />
-        <meta property="og:url" content="https://mi-sitio-phi.vercel.app" />
-        <meta
-            property="og:image"
-            content="https://mi-sitio-phi.vercel.app/og-image.jpg"
-        />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content="Sitio web personal de Jefry Francisco Sánchez Mora, desarrollador frontend especializado en tecnologías modernas como Astro.js, React.js y más.">
+  </head>
+  <body class="bg-white text-gray-900 font-sans">
+    <header class="p-6 text-xl font-semibold border-b border-gray-200">
+      <a href="/" class="hover:underline">Jefry Sánchez</a>
+    </header>
 
-        <HeadScript />
-    </head>
-    <body class="bg-white text-gray-900">
-        <header class="p-6 text-xl font-semibold">Jefry Sánchez</header>
-        <main class="px-4 py-8">
-            <slot />
-        </main>
-        <footer class="p-4 text-center text-sm text-gray-500">
-            © {year} Jefry Sánchez
-        </footer>
-    </body>
+    <main class="px-4 py-8">
+      <slot/>
+    </main>
+
+    <footer class="p-4 text-center text-sm text-gray-500 border-t border-gray-200">
+      © {new Date().getFullYear()} Jefry Sánchez — <a href="/cookies" class="underline">Política de Cookies</a>
+    </footer>
+  </body>
 </html>
