@@ -3,9 +3,23 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import Hero from "@/components/Hero.astro";
 import SobreMi from "../components/SobreMi.astro";
 import Contacto from "../components/Contacto.astro";
+
+const siteUrl = import.meta.env.SITE_URL;
+
+const seo = {
+	title: "Jefry Sánchez – Desarrollador Web Frontend",
+	description:
+		"Sitio web personal de Jefry Francisco Sánchez Mora, desarrollador frontend especializado en tecnologías modernas como Astro.js, React.js y más.",
+	canonical: `${siteUrl}`,
+};
 ---
 
-<BaseLayout>
+<BaseLayout
+	title={seo.title}
+	,
+	description={seo.description}
+	canonical={seo.canonical}
+>
 	<Hero />
 	<SobreMi />
 	<Contacto />
