@@ -45,10 +45,9 @@ const siteUrl = import.meta.env.SITE_URL;
     <footer
       class="p-4 text-center text-sm text-gray-500 border-t border-gray-200"
     >
-      © {new Date().getFullYear()} Jefry Sánchez — <a
-        href="/cookies"
-        class="underline">Política de Cookies</a
-      >
-    </footer>
+      © <span id="year">{new Date().getFullYear()}</span> Jefry Sánchez </footer>
   </body>
 </html>
+<script is:inline>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
