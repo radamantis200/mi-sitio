@@ -5,7 +5,7 @@ const { title, description, canonical } = Astro.props;
 const siteUrl = import.meta.env.SITE_URL;
 ---
 
-<html lang="es">
+<html lang="es" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,7 +13,6 @@ const siteUrl = import.meta.env.SITE_URL;
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
-    <!-- SEO Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -23,7 +22,6 @@ const siteUrl = import.meta.env.SITE_URL;
       content={`${siteUrl}images/opengraph/opengraph.webp`}
     />
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
@@ -31,23 +29,32 @@ const siteUrl = import.meta.env.SITE_URL;
       name="twitter:image"
       content={`${siteUrl}images/opengraph/opengraph.webp`}
     />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <HeadScript />
   </head>
-  <body class="bg-white text-gray-900 font-sans">
-    <header class="p-6 text-xl font-semibold border-b border-gray-200">
-      <a href="/" class="hover:underline">Jefry Sánchez</a>
-    </header>
 
+  <body
+    class="bg-slate-950 text-slate-300 font-['Inter',sans-serif] antialiased selection:bg-indigo-500/30"
+  >
     <main>
       <slot />
     </main>
 
-    <footer
-      class="p-4 text-center text-sm text-gray-500 border-t border-gray-200"
-    >
-      © <span id="year">{new Date().getFullYear()}</span> Jefry Sánchez </footer>
+    <footer class="border-t border-slate-800 bg-slate-950 py-8">
+      <div class="max-w-6xl mx-auto px-6 text-center text-sm text-slate-500">
+        © <span id="year">{new Date().getFullYear()}</span> Jefry Sánchez
+      </div>
+    </footer>
+
+    <script is:inline>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
   </body>
 </html>
-<script is:inline>
-  document.getElementById("year").textContent = new Date().getFullYear();
-</script>

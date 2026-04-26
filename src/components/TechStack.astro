@@ -1,0 +1,141 @@
+---
+const technologies = {
+    frontend: ["Angular", "Ionic", "Vue", "React", "Next.js", "Astro"],
+    backend: ["Laravel", ".NET Core", "Node.js", "PostgreSQL", "MySql"],
+    cms: ["Payload CMS", "WordPress", "Headless Architectures"],
+    cloud: ["AWS (EC2, S3)", "Vercel", "Docker", "CI/CD Pipelines", "Git"],
+};
+---
+
+<section id="tecnologias" class="max-w-7xl mx-auto px-6 py-16 border-t border-slate-900">
+    <div class="mb-10">
+        <h2 class="text-3xl font-bold text-white mb-4">Dominio Técnico</h2>
+        <p class="text-slate-400 max-w-xl">
+            A lo largo de más de 6 años, he perfeccionado mi stack para
+            construir soluciones robustas tanto en el cliente como en el
+            servidor y la nube.
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div>
+            <h3
+                class="text-indigo-400 font-semibold mb-6 flex items-center gap-2"
+            >
+                <span class="w-8 h-[1px] bg-indigo-500/50"></span> Frontend
+            </h3>
+            <ul class="space-y-4">
+                {
+                    technologies.frontend.map((tech) => (
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <svg
+                                class="w-4 h-4 text-indigo-500"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5l7 7-7 7"
+                                />
+                            </svg>
+                            <span class="font-medium">{tech}</span>
+                        </li>
+                    ))
+                }
+            </ul>
+        </div>
+
+        <div>
+            <h3
+                class="text-emerald-400 font-semibold mb-6 flex items-center gap-2"
+            >
+                <span class="w-8 h-[1px] bg-emerald-500/50"></span> Backend
+            </h3>
+            <ul class="space-y-4">
+                {
+                    technologies.backend.map((tech) => (
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <svg
+                                class="w-4 h-4 text-emerald-500"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5l7 7-7 7"
+                                />
+                            </svg>
+                            <span class="font-medium">{tech}</span>
+                        </li>
+                    ))
+                }
+            </ul>
+        </div>
+
+        <div>
+            <h3
+                class="text-amber-400 font-semibold mb-6 flex items-center gap-2"
+            >
+                <span class="w-8 h-[1px] bg-amber-500/50"></span> CMS & Estrategia
+            </h3>
+            <ul class="space-y-4">
+                {
+                    technologies.cms.map((tech) => (
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <svg
+                                class="w-4 h-4 text-amber-500"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5l7 7-7 7"
+                                />
+                            </svg>
+                            <span class="font-medium">{tech}</span>
+                        </li>
+                    ))
+                }
+            </ul>
+        </div>
+
+        <div>
+            <h3
+                class="text-cyan-400 font-semibold mb-6 flex items-center gap-2"
+            >
+                <span class="w-8 h-[1px] bg-cyan-500/50"></span> Cloud & DevOps
+            </h3>
+            <ul class="space-y-4">
+                {
+                    technologies.cloud.map((tech) => (
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <svg
+                                class="w-4 h-4 text-cyan-500"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5l7 7-7 7"
+                                />
+                            </svg>
+                            <span class="font-medium">{tech}</span>
+                        </li>
+                    ))
+                }
+            </ul>
+        </div>
+    </div>
+</section>
