@@ -1,15 +1,15 @@
 ---
-import '@fontsource/inter/400.css';
-import '@fontsource/inter/500.css';
-import '@fontsource/inter/600.css';
-import '@fontsource/inter/700.css';
+import "@fontsource/inter/400.css";
+import "@fontsource/inter/500.css";
+import "@fontsource/inter/600.css";
+import "@fontsource/inter/700.css";
 import "@/styles/global.css";
 import HeadScript from "@/partials/HeadScript.astro";
 const { title, description, canonical } = Astro.props;
 const siteUrl = import.meta.env.SITE_URL;
 ---
 
-<html lang="es" class="scroll-smooth">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -51,7 +51,8 @@ const siteUrl = import.meta.env.SITE_URL;
 
     <footer class="border-t border-slate-800 bg-slate-950 py-8">
       <div class="max-w-6xl mx-auto px-6 text-center text-sm text-slate-400">
-        © <span id="year">{new Date().getFullYear()}</span> Jefry Sánchez | Creado con pasión en Nicaragua
+        © <span id="year">{new Date().getFullYear()}</span> Jefry Sánchez | Made with
+        passion in Nicaragua
       </div>
     </footer>
 
