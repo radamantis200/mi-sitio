@@ -5,7 +5,8 @@ import "@fontsource/inter/600.css";
 import "@fontsource/inter/700.css";
 import "@/styles/global.css";
 import HeadScript from "@/partials/HeadScript.astro";
-const { title, description, canonical } = Astro.props;
+
+const { title, description, canonical, robots = "index, follow" } = Astro.props;
 const siteUrl = import.meta.env.SITE_URL;
 ---
 
@@ -21,7 +22,9 @@ const siteUrl = import.meta.env.SITE_URL;
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:type" content="website" />
-    <meta name="robots" content="index, follow">
+
+    <meta name="robots" content={robots} />
+
     <meta
       property="og:image"
       content={`${siteUrl}images/opengraph/opengraph.webp`}

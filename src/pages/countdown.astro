@@ -1,0 +1,29 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+// Importamos el componente React
+import CountdownReact from "@/components/Countdown"; 
+
+const siteUrl = import.meta.env.SITE_URL;
+
+const seo = {
+    title: "Cuenta Regresiva | Jefry Sánchez",
+    description:
+        "Acompáñame en la cuenta regresiva hacia una fecha muy especial este 4 de diciembre de 2026. Sitio personal de Jefry Francisco Sánchez Mora, Full-Stack Developer.",
+    canonical: `${siteUrl}countdown`,
+    robots: "noindex, nofollow",
+};
+---
+
+<BaseLayout
+    title={seo.title}
+    description={seo.description}
+    canonical={seo.canonical}
+    robots={seo.robots}
+>
+    <main class="min-h-[80vh] flex flex-col items-center justify-center p-6 bg-[#0B1120] text-white font-sans transition-colors duration-1000">
+        
+        {/* Renderizamos el componente React e hidratamos en el cliente */}
+        <CountdownReact client:load />
+
+    </main>
+</BaseLayout>
