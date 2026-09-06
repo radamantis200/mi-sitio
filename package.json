@@ -1,7 +1,10 @@
 {
-  "name": "starry-sphere",
+  "name": "gullible-giant",
   "type": "module",
   "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -11,28 +14,15 @@
   "dependencies": {
     "@astrojs/react": "^6.0.5",
     "@fontsource/inter": "^5.2.8",
+    "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
-    "astro": "^6.3.1",
+    "astro": "^7.3.1",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "tailwindcss": "^4.3.3"
   },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4.3.3",
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.5",
-    "postcss-import": "^16.1.0",
-    "sass-embedded": "^1.89.2",
-    "tailwindcss": "^4.1.10"
-  },
-  "pnpm": {
-    "overrides": {
-      "vite": "^6.0.0"
-    },
-    "onlyBuiltDependencies": [
-      "@parcel/watcher",
-      "esbuild",
-      "sharp"
-    ]
+  "allowScripts": {
+    "esbuild": true
   }
 }
