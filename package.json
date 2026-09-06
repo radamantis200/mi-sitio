@@ -26,8 +26,10 @@
     "tailwindcss": "^4.1.10"
   },
   "pnpm": {
-    "overrides": {
-      "vite": "^7.3.2"
-    }
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild",
+      "sharp"
+    ]
   }
 }
