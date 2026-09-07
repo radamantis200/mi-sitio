@@ -169,7 +169,7 @@ export default function Countdown() {
 
             {/* Mensaje de consuelo y realidad */}
             {!isFinished && (
-                <div className={`mb-10 max-w-2xl text-center p-5 rounded-2xl border backdrop-blur-sm shadow-lg transition-colors duration-700 ${theme.messageBox}`}>
+                <div className={`mb-10 mt-6 md:mt-0 order-last md:order-none max-w-2xl text-center p-5 rounded-2xl border backdrop-blur-sm shadow-lg transition-colors duration-700 ${theme.messageBox}`}>
                     <p className="text-sm sm:text-base md:text-lg font-medium italic tracking-wide">
                         "{currentMessage}"
                     </p>
