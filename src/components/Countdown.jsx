@@ -14,6 +14,15 @@ const DAILY_MESSAGES = [
     "No te desesperes. Todo acto tiene su consecuencia. Tómalo como una anécdota temporal, pronto volverás al volante."
 ];
 
+const MONTH_THEMES = {
+    "Septiembre": "text-amber-400 border-amber-500/30 bg-amber-500/10",
+    "Octubre": "text-orange-400 border-orange-500/30 bg-orange-500/10",
+    "Noviembre": "text-rose-400 border-rose-500/30 bg-rose-500/10",
+    "Diciembre": "text-cyan-400 border-cyan-500/30 bg-cyan-500/10"
+};
+
+const MONTH_NAMES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
 export default function Countdown() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [isWakeLockActive, setIsWakeLockActive] = useState(false);
@@ -24,15 +33,32 @@ export default function Countdown() {
     const [touchEnd, setTouchEnd] = useState(null);
     const minSwipeDistance = 50;
 
-    const [timeLeft, setTimeLeft] = useState({
-        days: 0,
-        hours: 0,
-        minutes: 0,
-        seconds: 0,
-        isFinished: false,
-    });
+    const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, isFinished: false });
     const [percentage, setPercentage] = useState(0);
-    const [calendarDays, setCalendarDays] = useState([]);
+    const [calendarMonths, setCalendarMonths] = useState([]);
+
+    const view1Ref = useRef(null);
+    const view2Ref = useRef(null);
+    const [containerHeight, setContainerHeight] = useState('auto');
+
+    useEffect(() => {
+        const updateHeight = () => {
+            if (activeView === 0 && view1Ref.current) {
+                setContainerHeight(view1Ref.current.offsetHeight);
+            } else if (activeView === 1 && view2Ref.current) {
+                setContainerHeight(view2Ref.current.offsetHeight);
+            }
+        };
+
+        updateHeight();
+        window.addEventListener('resize', updateHeight);
+        const timeout = setTimeout(updateHeight, 100);
+
+        return () => {
+            window.removeEventListener('resize', updateHeight);
+            clearTimeout(timeout);
+        };
+    }, [activeView, calendarMonths, isLoaded]);
 
     useEffect(() => {
         const generateCalendar = () => {
@@ -41,21 +67,30 @@ export default function Countdown() {
             const today = TEST_DATE ? new Date(TEST_DATE) : new Date();
             today.setHours(0, 0, 0, 0);
 
-            const daysArray = [];
+            const monthsMap = {};
             let current = new Date(start);
 
             while (current <= end) {
-                const isPast = current < today;
-                const isToday = current.getTime() === today.getTime();
+                const monthIdx = current.getMonth();
+                const year = current.getFullYear();
+                const key = `${year}-${monthIdx}`;
 
-                daysArray.push({
+                if (!monthsMap[key]) {
+                    monthsMap[key] = { monthName: MONTH_NAMES[monthIdx], year: year, days: [] };
+                }
+
+                monthsMap[key].days.push({
                     date: new Date(current),
-                    isPast,
-                    isToday
+                    isPast: current < today,
+                    isToday: current.getTime() === today.getTime(),
+                    isStart: current.getTime() === start.getTime(),
+                    isTarget: current.getTime() === end.getTime()
                 });
+
                 current.setDate(current.getDate() + 1);
             }
-            setCalendarDays(daysArray);
+
+            setCalendarMonths(Object.values(monthsMap));
         };
         generateCalendar();
     }, []);
@@ -78,9 +113,7 @@ export default function Countdown() {
     };
 
     const triggerHaptic = () => {
-        if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-            navigator.vibrate([50]);
-        }
+        if (typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate([50]);
     };
 
     const toggleWakeLock = async () => {
@@ -97,35 +130,22 @@ export default function Countdown() {
             } catch (err) {
                 console.error("Error con Wake Lock:", err);
             }
-        } else {
-            alert("Tu navegador no soporta mantener la pantalla encendida.");
         }
     };
 
     const enableAppBadge = async () => {
-        if (typeof window !== 'undefined' && !('Notification' in window)) {
-            alert("Tu navegador no soporta insignias en el ícono.");
-            return;
-        }
-
+        if (typeof window !== 'undefined' && !('Notification' in window)) return alert("Navegador no soportado para insignias.");
         const permission = await Notification.requestPermission();
-
         if (permission === 'granted') {
             if (typeof navigator !== 'undefined' && 'setAppBadge' in navigator) {
                 navigator.setAppBadge(timeLeft.days).catch(console.error);
                 alert("¡Listo! Ve a la pantalla de inicio y mira el ícono de la app.");
             }
-        } else {
-            alert("Necesitas aceptar el permiso para ver los días en el ícono.");
         }
     };
 
     useEffect(() => {
-        return () => {
-            if (wakeLockRef.current) {
-                wakeLockRef.current.release().catch(console.error);
-            }
-        };
+        return () => { if (wakeLockRef.current) wakeLockRef.current.release().catch(console.error); };
     }, []);
 
     useEffect(() => {
@@ -141,9 +161,7 @@ export default function Countdown() {
                 setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, isFinished: true });
                 setPercentage(100);
                 setIsLoaded(true);
-                if (typeof navigator !== 'undefined' && 'clearAppBadge' in navigator) {
-                    navigator.clearAppBadge().catch(console.error);
-                }
+                if (typeof navigator !== 'undefined' && 'clearAppBadge' in navigator) navigator.clearAppBadge().catch(console.error);
                 return;
             }
 
@@ -179,9 +197,7 @@ export default function Countdown() {
     const currentMessage = DAILY_MESSAGES[days % DAILY_MESSAGES.length];
 
     let theme = {
-        titleText: (
-            <>Faltan 3 meses para<br className="block lg:hidden" /> el 4 de Diciembre</>
-        ),
+        titleText: (<>Faltan 3 meses para<br className="block lg:hidden" /> el 4 de Diciembre</>),
         titleClasses: "from-indigo-400 to-cyan-400",
         barClasses: "from-indigo-500 to-cyan-400 shadow-[0_0_10px_rgba(99,102,241,0.3)]",
         secondsBox: "bg-indigo-900/20 border-indigo-500/30 shadow-indigo-500/10",
@@ -204,7 +220,7 @@ export default function Countdown() {
     if (!isLoaded) return <div className="min-h-screen w-full flex items-center justify-center text-white">Cargando...</div>;
 
     const NavIndicators = () => (
-        <div className="flex justify-center items-center gap-3 mb-8 w-full">
+        <div className="flex justify-center items-center gap-3 mb-6 w-full">
             <button
                 onClick={() => { setActiveView(0); triggerHaptic(); }}
                 className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${activeView === 0 ? 'bg-indigo-400 w-8' : 'bg-slate-700'}`}
@@ -219,17 +235,16 @@ export default function Countdown() {
     );
 
     return (
-        <div
-            className="w-full max-w-5xl overflow-hidden relative touch-pan-y"
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
+        <div 
+            className="w-full max-w-5xl overflow-hidden relative touch-pan-y transition-[height] duration-500 ease-in-out" 
+            style={{ height: containerHeight !== 'auto' ? `${containerHeight}px` : 'auto' }}
+            onTouchStart={onTouchStart} 
+            onTouchMove={onTouchMove} 
             onTouchEnd={onTouchEnd}
         >
-            <div
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${activeView * 100}%)` }}
-            >
-                <div className="w-full flex-shrink-0 flex flex-col items-center animate-fade-in px-4 pb-10">
+            <div className="flex transition-transform duration-500 ease-in-out items-start" style={{ transform: `translateX(-${activeView * 100}%)` }}>
+                
+                <div ref={view1Ref} className="w-full flex-shrink-0 flex flex-col items-center animate-fade-in px-4 pb-10">
                     <h1 className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r ${theme.titleClasses} text-center drop-shadow-sm transition-all duration-700`}>
                         {theme.titleText}
                     </h1>
@@ -242,20 +257,26 @@ export default function Countdown() {
                             {isFinished ? "100% completado" : `${percentage.toFixed(5)}% transcurrido`}
                         </span>
 
-                        {/* Contenedor de Botones de Hardware (Wake Lock y Badge) */}
-                        <div className="mt-4 flex flex-wrap justify-center gap-3">
-                            <button
-                                onClick={toggleWakeLock}
-                                className={`px-5 py-2 rounded-full text-xs md:text-sm font-medium border transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${isWakeLockActive ? "bg-yellow-500/20 border-yellow-500/50 text-yellow-300 shadow-[0_0_10px_rgba(234,179,8,0.2)]" : "bg-slate-800/50 border-slate-700 text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"}`}
+                        {/* NUEVOS BOTONES NIVELADOS Y MINIMALISTAS */}
+                        <div className="mt-5 grid grid-cols-2 gap-3 w-full max-w-[300px]">
+                            <button 
+                                onClick={toggleWakeLock} 
+                                className={`px-2 py-2.5 rounded-xl text-xs sm:text-sm font-medium border transition-all duration-300 flex items-center justify-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${
+                                    isWakeLockActive 
+                                        ? "bg-yellow-500/20 border-yellow-500/50 text-yellow-300 shadow-[0_0_10px_rgba(234,179,8,0.2)]" 
+                                        : "bg-slate-800/50 border-slate-700 text-slate-400 hover:text-slate-200 hover:bg-slate-700/50"
+                                }`}
                             >
-                                {isWakeLockActive ? "☀️ Pantalla Activa" : "🌙 Mantener Encendida"}
+                                <span className="text-base">{isWakeLockActive ? "☀️" : "🌙"}</span>
+                                <span>{isWakeLockActive ? "Fija" : "Pantalla"}</span>
                             </button>
 
-                            <button
-                                onClick={enableAppBadge}
-                                className="px-5 py-2 rounded-full text-xs md:text-sm font-medium border border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all duration-300"
+                            <button 
+                                onClick={enableAppBadge} 
+                                className="px-2 py-2.5 rounded-xl text-xs sm:text-sm font-medium border border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all duration-300 flex items-center justify-center gap-1.5"
                             >
-                                🔴 Activar Contador en Ícono
+                                <span className="text-base">🔴</span>
+                                <span>En Ícono</span>
                             </button>
                         </div>
                     </div>
@@ -283,45 +304,63 @@ export default function Countdown() {
                     )}
                 </div>
 
-                <div className="w-full flex-shrink-0 flex flex-col items-center px-4 pt-4 pb-10">
+                <div ref={view2Ref} className="w-full flex-shrink-0 flex flex-col items-center px-4 pt-4 pb-10">
                     <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400 text-center">
                         El Mapa del Castigo
                     </h2>
                     <p className="text-slate-400 text-sm mb-6 text-center max-w-md">
-                        Cada "X" roja es un día superado a pie. Los días grises son los que te faltan por cumplir.
+                        <span className="text-red-400 font-medium">Rojo</span> son días superados a pie. <span className="text-emerald-400 font-medium">Verde</span> los que faltan. El 4 de Septiembre 🚩 marca el inicio del error.
                     </p>
 
                     <NavIndicators />
 
-                    <div className="w-full max-w-3xl bg-slate-800/30 backdrop-blur-sm p-4 sm:p-6 rounded-3xl border border-slate-700/50 shadow-xl">
-                        <div className="grid grid-cols-7 gap-1 sm:gap-2 justify-items-center">
-                            {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((d, i) => (
-                                <div key={i} className="text-xs text-slate-500 font-semibold mb-2">{d}</div>
-                            ))}
+                    <div className="w-full max-w-3xl">
+                        {calendarMonths.map((monthData, mIndex) => {
+                            const monthTheme = MONTH_THEMES[monthData.monthName] || "text-slate-400 border-slate-500/30 bg-slate-800/50";
+                            
+                            return (
+                                <div key={mIndex} className="mb-8 bg-slate-800/30 backdrop-blur-sm p-4 sm:p-6 rounded-3xl border border-slate-700/50 shadow-xl">
+                                    
+                                    <div className={`px-4 py-2 rounded-xl mb-4 border text-center font-bold tracking-wider uppercase text-sm sm:text-base ${monthTheme}`}>
+                                        {monthData.monthName} {monthData.year}
+                                    </div>
 
-                            {calendarDays.map((dayObj, index) => {
-                                const isFirstDay = index === 0;
-                                const startDayOfWeek = dayObj.date.getDay();
-                                const emptySpacesCount = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
-                                const emptySpaces = isFirstDay ? Array.from({ length: emptySpacesCount }).map((_, i) => <div key={`empty-${i}`} className="w-8 h-8 sm:w-10 sm:h-10"></div>) : null;
+                                    <div className="grid grid-cols-7 gap-1 sm:gap-2 justify-items-center">
+                                        {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((d, i) => (
+                                            <div key={`head-${i}`} className="text-xs text-slate-500 font-semibold mb-2">{d}</div>
+                                        ))}
 
-                                return (
-                                    <React.Fragment key={index}>
-                                        {emptySpaces}
-                                        <div
-                                            onClick={triggerHaptic}
-                                            className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 cursor-pointer select-none
-                                                ${dayObj.isPast ? 'bg-red-900/20 text-red-500 border border-red-500/20 line-through decoration-red-500/50' : ''}
-                                                ${dayObj.isToday ? 'bg-indigo-500/20 text-indigo-300 border-2 border-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)] animate-pulse' : ''}
-                                                ${!dayObj.isPast && !dayObj.isToday ? 'bg-slate-800/50 text-slate-500 border border-slate-700/50 hover:bg-slate-700' : ''}
-                                            `}
-                                        >
-                                            {dayObj.isPast ? '✘' : dayObj.date.getDate()}
-                                        </div>
-                                    </React.Fragment>
-                                );
-                            })}
-                        </div>
+                                        {monthData.days.map((dayObj, index) => {
+                                            const isFirstDay = index === 0;
+                                            const startDayOfWeek = dayObj.date.getDay();
+                                            const emptySpacesCount = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
+                                            const emptySpaces = isFirstDay ? Array.from({ length: emptySpacesCount }).map((_, i) => <div key={`empty-${i}`} className="w-8 h-8 sm:w-10 sm:h-10"></div>) : null;
+
+                                            return (
+                                                <React.Fragment key={index}>
+                                                    {emptySpaces}
+                                                    <div
+                                                        onClick={triggerHaptic}
+                                                        className={`relative w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 cursor-pointer select-none
+                                                            ${dayObj.isStart ? 'ring-2 ring-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)] z-10' : ''}
+                                                            ${dayObj.isTarget ? 'ring-2 ring-indigo-400 shadow-[0_0_10px_rgba(129,140,248,0.5)] z-10' : ''}
+                                                            ${dayObj.isToday && !dayObj.isPast ? 'bg-indigo-500/30 text-indigo-200 border-2 border-indigo-400 shadow-[0_0_12px_rgba(99,102,241,0.8)] animate-pulse' : ''}
+                                                            ${dayObj.isPast && !dayObj.isToday ? 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20' : ''}
+                                                            ${!dayObj.isPast && !dayObj.isToday ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20' : ''}
+                                                        `}
+                                                    >
+                                                        {dayObj.date.getDate()}
+                                                        
+                                                        {dayObj.isStart && <span className="absolute -top-2 -right-2 text-[10px]">🚩</span>}
+                                                        {dayObj.isTarget && <span className="absolute -top-2 -right-2 text-[10px]">🏁</span>}
+                                                    </div>
+                                                </React.Fragment>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>
