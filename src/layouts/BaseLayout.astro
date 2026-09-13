@@ -13,36 +13,24 @@ const siteUrl = import.meta.env.SITE_URL;
 <html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <link rel="icon" type="image/svg+xml" href=`${siteUrl}/favicon.svg` />
+    <link rel="icon" type="image/svg+xml" href={`${siteUrl}/favicon.svg`} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:type" content="website" />
-    <meta name="theme-color" content="#0B1120">
-    <meta name="robots" content={robots} />
-
-    <meta
-      property="og:image"
-      content={`${siteUrl}images/opengraph/opengraph.webp`}
-    />
-
+    <meta property="og:image" content={`${siteUrl}images/opengraph/opengraph.webp`} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta
-      name="twitter:image"
-      content={`${siteUrl}images/opengraph/opengraph.webp`}
-    />
-    <meta name="theme-color" content="#020617" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
-
+    <meta name="twitter:image" content={`${siteUrl}images/opengraph/opengraph.webp`} />
+    <meta name="theme-color" content="#0B1120" />
+    <meta name="robots" content={robots} />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <HeadScript />
   </head>
 

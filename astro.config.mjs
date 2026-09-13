@@ -1,6 +1,4 @@
-// @ts-check
 import { defineConfig } from 'astro/config';
-
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 import AstroPWA from '@vite-pwa/astro';
@@ -19,10 +17,17 @@ export default defineConfig({
         theme_color: '#0B1120',
         background_color: '#0B1120',
         start_url: '/countdown',
+        icons: [
+          {
+            src: '/favicon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'any maskable'
+          }
+        ]
       }
     })
   ],
-
   vite: {
     plugins: [tailwindcss()]
   }
