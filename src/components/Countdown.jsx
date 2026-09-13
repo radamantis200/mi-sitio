@@ -75,7 +75,11 @@ export default function Countdown() {
     const currentMessage = DAILY_MESSAGES[days % DAILY_MESSAGES.length];
 
     let theme = {
-        titleText: "Faltan 3 meses para el 4 de Diciembre",
+        titleText: (
+            <>
+                Faltan 3 meses para<br className="block lg:hidden" /> el 4 de Diciembre
+            </>
+        ),
         titleClasses: "from-indigo-400 to-cyan-400",
         barClasses: "from-indigo-500 to-cyan-400 shadow-[0_0_10px_rgba(99,102,241,0.3)]",
         secondsBox: "bg-indigo-900/20 border-indigo-500/30 shadow-indigo-500/10",
@@ -86,10 +90,18 @@ export default function Countdown() {
     };
 
     if (isFinished) {
-        theme.titleText = "¡El gran día ha llegado! Ya puedes manejar.";
+        theme.titleText = (
+            <>
+                ¡El gran día ha llegado! <br className="block lg:hidden" /> Ya puedes manejar.
+            </>
+        );
     } else if (days <= 7) {
         theme = {
-            titleText: "¡Faltan menos de una semana!",
+            titleText: (
+                <>
+                    ¡Falta menos de <br className="block lg:hidden" /> una semana!
+                </>
+            ),
             titleClasses: "from-red-500 to-rose-400 animate-pulse",
             barClasses: "from-red-600 to-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.8)]",
             secondsBox: "bg-red-900/30 border-red-500/60 shadow-red-500/30 animate-pulse",
@@ -100,7 +112,11 @@ export default function Countdown() {
         };
     } else if (days <= 31) {
         theme = {
-            titleText: "Falta 1 mes para el 4 de Diciembre",
+            titleText: (
+                <>
+                    Falta 1 mes para <br className="block lg:hidden" />  el 4 de Diciembre
+                </>
+            ),
             titleClasses: "from-orange-400 to-amber-300",
             barClasses: "from-orange-500 to-amber-400 shadow-[0_0_10px_rgba(249,115,22,0.5)]",
             secondsBox: "bg-orange-900/20 border-orange-500/40 shadow-orange-500/20",
@@ -111,7 +127,11 @@ export default function Countdown() {
         };
     } else if (days <= 61) {
         theme = {
-            titleText: "Faltan 2 meses para el 4 de Diciembre",
+            titleText: (
+                <>
+                    Faltan 2 meses para <br className="block md:hidden" /> el 4 de Diciembre
+                </>
+            ),
             titleClasses: "from-purple-400 to-pink-400",
             barClasses: "from-purple-500 to-pink-400 shadow-[0_0_10px_rgba(168,85,247,0.5)]",
             secondsBox: "bg-purple-900/20 border-purple-500/40 shadow-purple-500/20",
