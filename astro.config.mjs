@@ -9,6 +9,7 @@ export default defineConfig({
     react(),
     AstroPWA({
       registerType: 'autoUpdate',
+      injectRegister: 'inline',
       manifest: {
         name: 'Cuenta Regresiva | Jefry Sánchez',
         short_name: 'Cuenta Regresiva',
