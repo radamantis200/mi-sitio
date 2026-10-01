@@ -39,6 +39,7 @@ export function useCountdown() {
     }, [activeView, calendarMonths, isLoaded]);
 
     // 2. Generación de datos del calendario
+// 2. Generación de datos del calendario
     useEffect(() => {
         const start = new Date(START_DATE);
         const end = new Date(TARGET_DATE);
@@ -73,7 +74,12 @@ export function useCountdown() {
             current.setDate(current.getDate() + 1);
         }
 
-        setCalendarMonths(Object.values(monthsMap));
+        // NUEVO: Filtramos los meses para quedarnos solo con los que tienen días presentes o futuros
+        const activeMonths = Object.values(monthsMap).filter(month => 
+            month.days.some(day => !day.isPast)
+        );
+
+        setCalendarMonths(activeMonths); // <-- Guardamos los meses filtrados
         setStats({ weekendsLeft: weekends, mondaysLeft: mondays, daysElapsed: elapsedCount });
     }, []);
 
