@@ -8,15 +8,23 @@ const MONTH_THEMES = {
     "Diciembre": "text-cyan-400 border-cyan-500/30 bg-cyan-500/10"
 };
 
-export default function CalendarView({ viewRef, calendarMonths, activeView, setActiveView, triggerHaptic }) {
+
+export default function CalendarView({ viewRef, calendarMonths, activeView, setActiveView, triggerHaptic, isFinished }) {
     return (
         <div ref={viewRef} className="w-full min-w-full flex-shrink-0 flex flex-col items-center animate-fade-in px-4 pt-6 pb-6">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-slate-200 to-slate-400 text-center drop-shadow-sm leading-tight">
-                Lo que Queda por Delante
+
+            <h2 className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r text-center drop-shadow-sm leading-tight transition-colors duration-500 ${isFinished ? 'from-emerald-300 to-cyan-300' : 'from-slate-200 to-slate-400'}`}>
+                {isFinished ? "¡El Camino Recorrido!" : "Lo que Queda por Delante"}
             </h2>
 
-            <p className="text-slate-400 text-sm md:text-base text-center leading-relaxed mb-8">
-                <span className="text-red-400 font-medium">Rojo</span> son días pasados. <span className="text-emerald-400 font-medium">Verde</span> los que faltan. <br className="hidden sm:block" />
+            <p className="text-slate-400 text-sm md:text-base text-center leading-relaxed mb-8 h-6">
+                {isFinished ? (
+                    <span className="text-emerald-400 font-medium animate-pulse">¡Has completado todos los días con éxito!</span>
+                ) : (
+                    <>
+                        <span className="text-red-400 font-medium">Rojo</span> son días pasados. <span className="text-emerald-400 font-medium">Verde</span> los que faltan.
+                    </>
+                )}
             </p>
 
             <div className="w-full max-w-3xl">
@@ -41,17 +49,27 @@ export default function CalendarView({ viewRef, calendarMonths, activeView, setA
                                     const emptySpacesCount = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
                                     const emptySpaces = isFirstDay ? Array.from({ length: emptySpacesCount }).map((_, i) => <div key={`empty-${i}`} className="w-8 h-8 sm:w-10 sm:h-10"></div>) : null;
 
+                                    let dayClasses = "";
+
+                                    if (isFinished && dayObj.isTarget) {
+                                        dayClasses = "bg-emerald-500/30 text-emerald-200 border-2 border-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.8)] animate-pulse z-10";
+                                    } else if (dayObj.isToday) {
+                                        dayClasses = "bg-indigo-500/30 text-indigo-200 border-2 border-indigo-400 shadow-[0_0_12px_rgba(99,102,241,0.8)] animate-pulse z-10";
+                                    } else if (dayObj.isPast) {
+                                        dayClasses = "bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20";
+                                    } else {
+                                        dayClasses = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20";
+                                    }
+
                                     return (
                                         <React.Fragment key={index}>
                                             {emptySpaces}
                                             <div
                                                 onClick={triggerHaptic}
-                                                className={`relative w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 cursor-pointer select-none
+                                                className={`relative w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 cursor-pointer select-none 
                                                     ${dayObj.isStart ? 'ring-2 ring-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)] z-10' : ''}
-                                                    ${dayObj.isTarget ? 'ring-2 ring-indigo-400 shadow-[0_0_10px_rgba(129,140,248,0.5)] z-10' : ''}
-                                                    ${dayObj.isToday && !dayObj.isPast ? 'bg-indigo-500/30 text-indigo-200 border-2 border-indigo-400 shadow-[0_0_12px_rgba(99,102,241,0.8)] animate-pulse' : ''}
-                                                    ${dayObj.isPast && !dayObj.isToday ? 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20' : ''}
-                                                    ${!dayObj.isPast && !dayObj.isToday ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20' : ''}
+                                                    ${dayObj.isTarget && !isFinished ? 'ring-2 ring-indigo-400 shadow-[0_0_10px_rgba(129,140,248,0.5)] z-10' : ''}
+                                                    ${dayClasses}
                                                 `}
                                             >
                                                 {dayObj.date.getDate()}

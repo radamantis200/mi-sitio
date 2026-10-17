@@ -1,6 +1,9 @@
 import NavIndicators from './NavIndicators';
 
 export default function SummaryView({ viewRef, theme, percentage, isFinished, days, stats, isWakeLockActive, toggleWakeLock, enableAppBadge, activeView, setActiveView, triggerHaptic }) {
+
+    const displayPercent = isFinished ? "100" : (Math.trunc(percentage * 100) / 100).toFixed(2);
+
     return (
         <div ref={viewRef} className="w-full min-w-full flex-shrink-0 flex flex-col items-center animate-fade-in px-4 pt-6 pb-6">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 text-center drop-shadow-sm leading-tight">
@@ -29,17 +32,17 @@ export default function SummaryView({ viewRef, theme, percentage, isFinished, da
                 </div>
 
                 <span className={`text-sm md:text-base font-medium tabular-nums tracking-wider mt-2 ${theme.progressText}`}>
-                    {isFinished ? "100% completado" : `${percentage.toFixed(5)}% transcurrido`}
+                    {isFinished ? "100% completado" : `${displayPercent}% transcurrido`}
                 </span>
             </div>
 
             <div className="w-full max-w-3xl flex flex-col gap-4">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                     {[
-                        { val: stats.daysElapsed, suffix: " / 91", label: "Días Cumplidos", color: "text-emerald-400" },
-                        { val: days, suffix: "", label: "Días Restantes", color: "text-amber-400" },
-                        { val: Math.ceil(days / 7), suffix: "", label: "Semanas", color: "text-cyan-400" },
-                        { val: `${percentage.toFixed(1)}%`, suffix: "", label: "Avance Total", color: "text-indigo-400" }
+                        { val: isFinished ? 91 : stats.daysElapsed, suffix: " / 91", label: "Días Cumplidos", color: "text-emerald-400" },
+                        { val: isFinished ? 0 : (days === 0 ? "< 1" : days), suffix: "", label: "Días Restantes", color: "text-amber-400" },
+                        { val: isFinished ? 0 : Math.ceil(days / 7), suffix: "", label: "Semanas", color: "text-cyan-400" },
+                        { val: isFinished ? "100%" : `${displayPercent}%`, suffix: "", label: "Avance Total", color: "text-indigo-400" }
                     ].map((stat, i) => (
                         <div key={i} className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/60 p-4 rounded-2xl flex flex-col items-center justify-center">
                             <span className={`text-2xl sm:text-3xl font-bold ${stat.color} tabular-nums`}>
@@ -60,10 +63,10 @@ export default function SummaryView({ viewRef, theme, percentage, isFinished, da
                             </div>
                             <span className="text-xs text-slate-400 font-mono">04 Sep 2026</span>
                         </div>
-                        <div className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${percentage >= 50 ? "bg-slate-800/60 border-slate-700/40" : "bg-slate-800/20 border-slate-800/50 opacity-80"}`}>
+                        <div className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${percentage >= 50 || isFinished ? "bg-slate-800/60 border-slate-700/40" : "bg-slate-800/20 border-slate-800/50 opacity-80"}`}>
                             <div className="flex items-center gap-3">
-                                <span className={`w-2.5 h-2.5 rounded-full ${percentage >= 50 ? "bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" : "bg-slate-600"}`}></span>
-                                <span className={percentage >= 50 ? "text-slate-200 font-medium" : "text-slate-400"}>Punto Medio (50%)</span>
+                                <span className={`flex w-2.5 h-2.5 rounded-full ${percentage >= 50 || isFinished ? "bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" : "bg-slate-600"}`}></span>
+                                <span className={percentage >= 50 || isFinished ? "text-slate-200 font-medium" : "text-slate-400"}>Punto Medio (50%)</span>
                             </div>
                             <span className="text-xs text-slate-400 font-mono">19 Oct 2026</span>
                         </div>

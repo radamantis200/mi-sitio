@@ -38,12 +38,12 @@ export function useCountdown() {
         return () => { window.removeEventListener('resize', updateHeight); clearTimeout(timeout); };
     }, [activeView, calendarMonths, isLoaded]);
 
-    // 2. Generación de datos del calendario
-// 2. Generación de datos del calendario
+    // 2. Generación de datos del calendario (CORREGIDO)
     useEffect(() => {
         const start = new Date(START_DATE);
         const end = new Date(TARGET_DATE);
-        const today = TEST_DATE ? new Date(TEST_DATE) : new Date();
+        // Si ya terminó, forzamos que "today" sea el final.
+        const today = timeLeft.isFinished ? new Date(TARGET_DATE) : (TEST_DATE ? new Date(TEST_DATE) : new Date());
         today.setHours(0, 0, 0, 0);
 
         const monthsMap = {};
@@ -56,14 +56,18 @@ export function useCountdown() {
             const monthIdx = current.getMonth();
             const year = current.getFullYear();
             const key = `${year}-${monthIdx}`;
-            const isPast = current < today;
-            const isFuture = current >= today;
+            
+            const isPast = timeLeft.isFinished ? current <= end : current < today;
+            const isFuture = timeLeft.isFinished ? false : current >= today;
 
             if (!monthsMap[key]) monthsMap[key] = { monthName: MONTH_NAMES[monthIdx], year: year, days: [] };
 
             monthsMap[key].days.push({
-                date: new Date(current), isPast, isToday: current.getTime() === today.getTime(),
-                isStart: current.getTime() === start.getTime(), isTarget: current.getTime() === end.getTime()
+                date: new Date(current), 
+                isPast, 
+                isToday: timeLeft.isFinished ? current.getTime() === end.getTime() : current.getTime() === today.getTime(),
+                isStart: current.getTime() === start.getTime(), 
+                isTarget: current.getTime() === end.getTime()
             });
 
             if (isPast) elapsedCount++;
@@ -74,14 +78,17 @@ export function useCountdown() {
             current.setDate(current.getDate() + 1);
         }
 
-        // NUEVO: Filtramos los meses para quedarnos solo con los que tienen días presentes o futuros
         const activeMonths = Object.values(monthsMap).filter(month => 
-            month.days.some(day => !day.isPast)
+            timeLeft.isFinished ? month.year === end.getFullYear() && month.monthName === MONTH_NAMES[end.getMonth()] : month.days.some(day => !day.isPast)
         );
 
-        setCalendarMonths(activeMonths); // <-- Guardamos los meses filtrados
-        setStats({ weekendsLeft: weekends, mondaysLeft: mondays, daysElapsed: elapsedCount });
-    }, []);
+        setCalendarMonths(activeMonths); 
+        setStats({ 
+            weekendsLeft: timeLeft.isFinished ? 0 : weekends, 
+            mondaysLeft: timeLeft.isFinished ? 0 : mondays, 
+            daysElapsed: timeLeft.isFinished ? 91 : elapsedCount 
+        });
+    }, [timeLeft.isFinished]);
 
     // 3. Cálculo de tiempo en tiempo real
     useEffect(() => {

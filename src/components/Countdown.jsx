@@ -41,7 +41,7 @@ export default function Countdown() {
                 <CalendarView
                     viewRef={view3Ref} calendarMonths={calendarMonths}
                     activeView={activeView} setActiveView={setActiveView}
-                    triggerHaptic={triggerHaptic}
+                    triggerHaptic={triggerHaptic} isFinished={isFinished}
                 />
 
             </div>
