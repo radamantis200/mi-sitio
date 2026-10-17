@@ -16,7 +16,7 @@ export default function CalendarView({ viewRef, calendarMonths, activeView, setA
             </h2>
 
             <p className="text-slate-400 text-sm md:text-base text-center leading-relaxed mb-8">
-                <span className="text-red-400 font-medium">Rojo</span> son días pasados. <span className="text-emerald-400 font-medium">Verde</span> los que faltan. <br className="hidden sm:block" /> El 4 de Septiembre 🚩 marca el inicio.
+                <span className="text-red-400 font-medium">Rojo</span> son días pasados. <span className="text-emerald-400 font-medium">Verde</span> los que faltan. <br className="hidden sm:block" />
             </p>
 
             <div className="w-full max-w-3xl">
