@@ -1,9 +1,9 @@
 import NavIndicators from './NavIndicators';
 
 export default function SummaryView({ viewRef, theme, percentage, isFinished, summaryData, isWakeLockActive, toggleWakeLock, enableAppBadge, activeView, setActiveView, triggerHaptic }) {
-    
+
     // Desestructuramos la data ya procesada por el Hook
-    const { displayPercent, completedDays, daysLeft, weeksLeft, hoursLeft, isSingular, formatValue } = summaryData;
+    const { displayPercent, currentDay, daysLeft, weeksLeft, hoursLeft, isSingular, formatValue } = summaryData;
 
     return (
         <div ref={viewRef} className="w-full min-w-full flex-shrink-0 flex flex-col items-center animate-fade-in px-4 pt-6 pb-6">
@@ -39,7 +39,12 @@ export default function SummaryView({ viewRef, theme, percentage, isFinished, su
             <div className="w-full max-w-3xl flex flex-col gap-4">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                     {[
-                        { val: completedDays, suffix: " / 91", label: completedDays === 1 ? "Día Cumplido" : "Días Cumplidos", color: "text-emerald-400" },
+                        {
+                            val: currentDay,
+                            suffix: " / 91",
+                            label: isFinished ? "Días Completados" : "Día Actual",
+                            color: "text-emerald-400"
+                        },
                         { val: formatValue(daysLeft), suffix: "", label: isSingular(daysLeft) ? "Día Restante" : "Días Restantes", color: "text-amber-400" },
                         { val: formatValue(weeksLeft), suffix: "", label: isSingular(weeksLeft) ? "Semana" : "Semanas", color: "text-cyan-400" },
                         { val: formatValue(hoursLeft), suffix: "", label: isSingular(hoursLeft) ? "Hora Faltante" : "Horas Faltantes", color: "text-indigo-400" }
@@ -83,5 +88,5 @@ export default function SummaryView({ viewRef, theme, percentage, isFinished, su
 
             <NavIndicators activeView={activeView} setActiveView={setActiveView} triggerHaptic={triggerHaptic} />
         </div>
-    ); 
+    );
 }

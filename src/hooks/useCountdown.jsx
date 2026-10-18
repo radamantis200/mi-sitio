@@ -49,11 +49,15 @@ export function useCountdown() {
         const { isFinished, days, totalHours } = timeLeft;
         const displayPercent = isFinished ? "100" : (Math.trunc(percentage * 100) / 100).toFixed(2);
         const weeksLeft = Math.floor(days / 7);
-        const completedDays = isFinished ? 91 : Math.max(0, 91 - days - 1);
+
+        // LA LÓGICA MÁS LIMPIA: Calculamos en qué día estamos
+        const currentDay = isFinished ? 91 : (91 - days);
+
         const isSingular = (val) => val === 1 || (val === 0 && !isFinished);
         const formatValue = (val) => val === 0 && !isFinished ? "< 1" : val?.toLocaleString('es-ES');
 
-        return { displayPercent, completedDays, daysLeft: isFinished ? 0 : days, weeksLeft: isFinished ? 0 : weeksLeft, hoursLeft: isFinished ? 0 : totalHours, isSingular, formatValue };
+        // Renombramos completedDays a currentDay
+        return { displayPercent, currentDay, daysLeft: isFinished ? 0 : days, weeksLeft: isFinished ? 0 : weeksLeft, hoursLeft: isFinished ? 0 : totalHours, isSingular, formatValue };
     };
 
     const getTheme = () => {
