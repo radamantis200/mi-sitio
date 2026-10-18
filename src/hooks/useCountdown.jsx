@@ -48,7 +48,8 @@ export function useCountdown() {
     const getSummaryData = () => {
         const { isFinished, days, totalHours } = timeLeft;
         const displayPercent = isFinished ? "100" : (Math.trunc(percentage * 100) / 100).toFixed(2);
-        const weeksLeft = Math.floor(days / 7);
+
+        const weeksLeft = isFinished ? 0 : (days < 7 ? 0 : Math.ceil(days / 7));
 
         const daysPassed = 91 - days;
         const currentDay = isFinished ? 91 : Math.min(90, daysPassed);
