@@ -1,155 +1,21 @@
 import { useState, useEffect, useRef } from "react";
-
-const TARGET_DATE = "2026-12-04T00:00:00";
-const START_DATE = "2026-09-04T00:00:00";
-const TEST_DATE = null;
-const MONTH_NAMES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-const MIN_SWIPE_DISTANCE = 50;
+import { useTime } from "./useTime";
+import { useCalendar } from "./useCalendar";
+import { useSwipeViews } from "./useSwipeViews";
 
 export function useCountdown() {
-    const [isLoaded, setIsLoaded] = useState(false);
+    // 1. Integración de los Hooks modularizados
+    const { isLoaded, timeLeft, percentage } = useTime();
+    const { calendarMonths } = useCalendar(timeLeft.days, timeLeft.isFinished);
+    const swipe = useSwipeViews(calendarMonths, isLoaded);
+
+    // 2. Funciones del Sistema (WakeLock, AppBadge, Haptic)
     const [isWakeLockActive, setIsWakeLockActive] = useState(false);
     const wakeLockRef = useRef(null);
 
-    const [activeView, setActiveView] = useState(0);
-    const [touchStart, setTouchStart] = useState(null);
-    const [touchEnd, setTouchEnd] = useState(null);
-
-    const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, totalHours: 0, isFinished: false });
-    const [percentage, setPercentage] = useState(0);
-    const [calendarMonths, setCalendarMonths] = useState([]);
-    const [stats, setStats] = useState({ weekendsLeft: 0, mondaysLeft: 0, daysElapsed: 0 });
-
-    const view1Ref = useRef(null);
-    const view2Ref = useRef(null);
-    const view3Ref = useRef(null);
-    const [containerHeight, setContainerHeight] = useState('auto');
-
-    // 1. Manejo de altura dinámica
-    useEffect(() => {
-        const updateHeight = () => {
-            if (activeView === 0 && view1Ref.current) setContainerHeight(view1Ref.current.offsetHeight);
-            else if (activeView === 1 && view2Ref.current) setContainerHeight(view2Ref.current.offsetHeight);
-            else if (activeView === 2 && view3Ref.current) setContainerHeight(view3Ref.current.offsetHeight);
-        };
-        updateHeight();
-        window.addEventListener('resize', updateHeight);
-        const timeout = setTimeout(updateHeight, 100);
-        return () => { window.removeEventListener('resize', updateHeight); clearTimeout(timeout); };
-    }, [activeView, calendarMonths, isLoaded]);
-
-    // 2. Generación de datos del calendario (CORREGIDO)
-    useEffect(() => {
-        const start = new Date(START_DATE);
-        const end = new Date(TARGET_DATE);
-        // Si ya terminó, forzamos que "today" sea el final.
-        const today = timeLeft.isFinished ? new Date(TARGET_DATE) : (TEST_DATE ? new Date(TEST_DATE) : new Date());
-        today.setHours(0, 0, 0, 0);
-
-        const monthsMap = {};
-        let current = new Date(start);
-        let weekends = 0;
-        let mondays = 0;
-        let elapsedCount = 0;
-
-        while (current <= end) {
-            const monthIdx = current.getMonth();
-            const year = current.getFullYear();
-            const key = `${year}-${monthIdx}`;
-            
-            const isPast = timeLeft.isFinished ? current <= end : current < today;
-            const isFuture = timeLeft.isFinished ? false : current >= today;
-
-            if (!monthsMap[key]) monthsMap[key] = { monthName: MONTH_NAMES[monthIdx], year: year, days: [] };
-
-            monthsMap[key].days.push({
-                date: new Date(current), 
-                isPast, 
-                isToday: timeLeft.isFinished ? current.getTime() === end.getTime() : current.getTime() === today.getTime(),
-                isStart: current.getTime() === start.getTime(), 
-                isTarget: current.getTime() === end.getTime()
-            });
-
-            if (isPast) elapsedCount++;
-            if (isFuture) {
-                if (current.getDay() === 6) weekends++;
-                if (current.getDay() === 1) mondays++;
-            }
-            current.setDate(current.getDate() + 1);
-        }
-
-        const activeMonths = Object.values(monthsMap).filter(month => 
-            timeLeft.isFinished ? month.year === end.getFullYear() && month.monthName === MONTH_NAMES[end.getMonth()] : month.days.some(day => !day.isPast)
-        );
-
-        setCalendarMonths(activeMonths); 
-        setStats({ 
-            weekendsLeft: timeLeft.isFinished ? 0 : weekends, 
-            mondaysLeft: timeLeft.isFinished ? 0 : mondays, 
-            daysElapsed: timeLeft.isFinished ? 91 : elapsedCount 
-        });
-    }, [timeLeft.isFinished]);
-
-    // 3. Cálculo de tiempo en tiempo real
-    useEffect(() => {
-        const target = new Date(TARGET_DATE).getTime();
-        const start = new Date(START_DATE).getTime();
-        const timeOffset = TEST_DATE ? new Date(TEST_DATE).getTime() - new Date().getTime() : 0;
-
-        const calculateTime = () => {
-            const now = new Date().getTime() + timeOffset;
-            const difference = target - now;
-
-            if (difference <= 0) {
-                setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, totalHours: 0, isFinished: true });
-                setPercentage(100);
-                setIsLoaded(true);
-                if (typeof navigator !== 'undefined' && 'clearAppBadge' in navigator) navigator.clearAppBadge().catch(console.error);
-                return;
-            }
-
-            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-            const totalHours = Math.floor(difference / (1000 * 60 * 60));
-
-            const totalDuration = target - start;
-            const elapsed = now - start;
-            let currentPercentage = Math.min(Math.max((elapsed / totalDuration) * 100, 0), 100);
-
-            if (typeof navigator !== 'undefined' && 'setAppBadge' in navigator && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-                navigator.setAppBadge(days).catch(console.error);
-            }
-
-            setTimeLeft({ days, hours, minutes, seconds, totalHours, isFinished: false });
-            setPercentage(currentPercentage);
-            setIsLoaded(true);
-        };
-
-        calculateTime();
-        const timer = setInterval(calculateTime, 1000);
-        return () => clearInterval(timer);
-    }, []);
-
-    // 4. Limpieza de WakeLock
     useEffect(() => {
         return () => { if (wakeLockRef.current) wakeLockRef.current.release().catch(console.error); };
     }, []);
-
-    // 5. Handlers de Gestos (Swipe)
-    const onTouchStart = (e) => { setTouchEnd(null); setTouchStart(e.targetTouches[0].clientX); };
-    const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
-    const onTouchEnd = () => {
-        if (!touchStart || !touchEnd) return;
-        const distance = touchStart - touchEnd;
-        if (distance > MIN_SWIPE_DISTANCE && activeView < 2) setActiveView((prev) => prev + 1);
-        if (distance < -MIN_SWIPE_DISTANCE && activeView > 0) setActiveView((prev) => prev - 1);
-    };
-
-    // 6. Utilidades
-    const triggerHaptic = () => { if (typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate([50]); };
-    const format = (num) => num.toString().padStart(2, "0");
 
     const toggleWakeLock = async () => {
         if (typeof navigator !== 'undefined' && 'wakeLock' in navigator) {
@@ -175,7 +41,21 @@ export function useCountdown() {
         }
     };
 
-    // 7. Generación de Tema Dinámico
+    const triggerHaptic = () => { if (typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate([50]); };
+    const format = (num) => num.toString().padStart(2, "0");
+
+    // 3. Lógica UI Digerida
+    const getSummaryData = () => {
+        const { isFinished, days, totalHours } = timeLeft;
+        const displayPercent = isFinished ? "100" : (Math.trunc(percentage * 100) / 100).toFixed(2);
+        const weeksLeft = Math.floor(days / 7);
+        const completedDays = isFinished ? 91 : Math.max(0, 91 - days - 1);
+        const isSingular = (val) => val === 1 || (val === 0 && !isFinished);
+        const formatValue = (val) => val === 0 && !isFinished ? "< 1" : val?.toLocaleString('es-ES');
+
+        return { displayPercent, completedDays, daysLeft: isFinished ? 0 : days, weeksLeft: isFinished ? 0 : weeksLeft, hoursLeft: isFinished ? 0 : totalHours, isSingular, formatValue };
+    };
+
     const getTheme = () => {
         const { days, isFinished } = timeLeft;
         let theme = {
@@ -200,14 +80,12 @@ export function useCountdown() {
         return theme;
     };
 
+    // 4. Exportamos todo el ecosistema (Misma API que tenías antes)
     return {
-        // Estado
-        isLoaded, isWakeLockActive, activeView, timeLeft, percentage, calendarMonths, stats, containerHeight,
-        // Refs
-        view1Ref, view2Ref, view3Ref,
-        // Acciones
-        setActiveView, onTouchStart, onTouchMove, onTouchEnd, triggerHaptic, toggleWakeLock, enableAppBadge, format,
-        // Derivados
-        theme: getTheme()
+        isLoaded, isWakeLockActive, timeLeft, percentage, calendarMonths,
+        ...swipe,
+        triggerHaptic, toggleWakeLock, enableAppBadge, format,
+        theme: getTheme(),
+        summaryData: getSummaryData()
     };
 }

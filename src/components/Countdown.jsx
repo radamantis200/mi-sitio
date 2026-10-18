@@ -7,7 +7,7 @@ export default function Countdown() {
     const {
         isLoaded, isWakeLockActive, activeView, timeLeft, percentage, calendarMonths, stats, containerHeight, theme,
         view1Ref, view2Ref, view3Ref,
-        setActiveView, onTouchStart, onTouchMove, onTouchEnd, triggerHaptic, toggleWakeLock, enableAppBadge, format
+        setActiveView, onTouchStart, onTouchMove, onTouchEnd, triggerHaptic, toggleWakeLock, enableAppBadge, format, summaryData
     } = useCountdown();
 
     if (!isLoaded) return <div className="min-h-screen w-full flex items-center justify-center text-white">Cargando...</div>;
@@ -28,6 +28,7 @@ export default function Countdown() {
                     viewRef={view1Ref} theme={theme} format={format}
                     days={days} hours={hours} minutes={minutes} seconds={seconds}
                     triggerHaptic={triggerHaptic} activeView={activeView} setActiveView={setActiveView}
+                    summaryData={summaryData}
                 />
 
                 <SummaryView
@@ -36,12 +37,13 @@ export default function Countdown() {
                     isWakeLockActive={isWakeLockActive} toggleWakeLock={toggleWakeLock}
                     enableAppBadge={enableAppBadge} activeView={activeView}
                     setActiveView={setActiveView} triggerHaptic={triggerHaptic}
+                    summaryData={summaryData}
                 />
 
                 <CalendarView
                     viewRef={view3Ref} calendarMonths={calendarMonths}
                     activeView={activeView} setActiveView={setActiveView}
-                    triggerHaptic={triggerHaptic} isFinished={isFinished}
+                    triggerHaptic={triggerHaptic} isFinished={isFinished} summaryData={summaryData}
                 />
 
             </div>

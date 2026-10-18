@@ -1,8 +1,9 @@
 import NavIndicators from './NavIndicators';
 
-export default function SummaryView({ viewRef, theme, percentage, isFinished, days, stats, isWakeLockActive, toggleWakeLock, enableAppBadge, activeView, setActiveView, triggerHaptic }) {
-
-    const displayPercent = isFinished ? "100" : (Math.trunc(percentage * 100) / 100).toFixed(2);
+export default function SummaryView({ viewRef, theme, percentage, isFinished, summaryData, isWakeLockActive, toggleWakeLock, enableAppBadge, activeView, setActiveView, triggerHaptic }) {
+    
+    // Desestructuramos la data ya procesada por el Hook
+    const { displayPercent, completedDays, daysLeft, weeksLeft, hoursLeft, isSingular, formatValue } = summaryData;
 
     return (
         <div ref={viewRef} className="w-full min-w-full flex-shrink-0 flex flex-col items-center animate-fade-in px-4 pt-6 pb-6">
@@ -21,11 +22,10 @@ export default function SummaryView({ viewRef, theme, percentage, isFinished, da
                     </div>
 
                     <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <button onClick={toggleWakeLock} title={isWakeLockActive ? "Pantalla fija activa" : "Fijar pantalla"} className={`w-8 h-8 rounded-full text-xs border flex items-center justify-center transition-all cursor-pointer ${isWakeLockActive ? "bg-yellow-500/20 border-yellow-500/60 text-yellow-300 shadow-[0_0_8px_rgba(234,179,8,0.3)]" : "bg-slate-800/60 border-slate-700 text-slate-400 hover:text-slate-200"}`}>
+                        <button onClick={toggleWakeLock} className={`w-8 h-8 rounded-full text-xs border flex items-center justify-center transition-all cursor-pointer ${isWakeLockActive ? "bg-yellow-500/20 border-yellow-500/60 text-yellow-300 shadow-[0_0_8px_rgba(234,179,8,0.3)]" : "bg-slate-800/60 border-slate-700 text-slate-400 hover:text-slate-200"}`}>
                             {isWakeLockActive ? "☀️" : "🌙"}
                         </button>
-
-                        <button onClick={enableAppBadge} title="Activar insignia en ícono" className="w-8 h-8 rounded-full text-xs border border-red-500/40 bg-red-500/10 text-red-400 hover:bg-red-500/20 flex items-center justify-center transition-all cursor-pointer">
+                        <button onClick={enableAppBadge} className="w-8 h-8 rounded-full text-xs border border-red-500/40 bg-red-500/10 text-red-400 hover:bg-red-500/20 flex items-center justify-center transition-all cursor-pointer">
                             🔴
                         </button>
                     </div>
@@ -39,10 +39,10 @@ export default function SummaryView({ viewRef, theme, percentage, isFinished, da
             <div className="w-full max-w-3xl flex flex-col gap-4">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                     {[
-                        { val: isFinished ? 91 : stats.daysElapsed, suffix: " / 91", label: "Días Cumplidos", color: "text-emerald-400" },
-                        { val: isFinished ? 0 : (days === 0 ? "< 1" : days), suffix: "", label: "Días Restantes", color: "text-amber-400" },
-                        { val: isFinished ? 0 : Math.ceil(days / 7), suffix: "", label: "Semanas", color: "text-cyan-400" },
-                        { val: isFinished ? "100%" : `${displayPercent}%`, suffix: "", label: "Avance Total", color: "text-indigo-400" }
+                        { val: completedDays, suffix: " / 91", label: completedDays === 1 ? "Día Cumplido" : "Días Cumplidos", color: "text-emerald-400" },
+                        { val: formatValue(daysLeft), suffix: "", label: isSingular(daysLeft) ? "Día Restante" : "Días Restantes", color: "text-amber-400" },
+                        { val: formatValue(weeksLeft), suffix: "", label: isSingular(weeksLeft) ? "Semana" : "Semanas", color: "text-cyan-400" },
+                        { val: formatValue(hoursLeft), suffix: "", label: isSingular(hoursLeft) ? "Hora Faltante" : "Horas Faltantes", color: "text-indigo-400" }
                     ].map((stat, i) => (
                         <div key={i} className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/60 p-4 rounded-2xl flex flex-col items-center justify-center">
                             <span className={`text-2xl sm:text-3xl font-bold ${stat.color} tabular-nums`}>
@@ -83,5 +83,5 @@ export default function SummaryView({ viewRef, theme, percentage, isFinished, da
 
             <NavIndicators activeView={activeView} setActiveView={setActiveView} triggerHaptic={triggerHaptic} />
         </div>
-    );
+    ); 
 }
