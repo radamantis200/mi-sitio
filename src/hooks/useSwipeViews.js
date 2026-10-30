@@ -4,8 +4,8 @@ import { MIN_SWIPE_DISTANCE } from "./config";
 export function useSwipeViews(calendarMonths, isLoaded) {
     const [activeView, setActiveView] = useState(0);
     const [containerHeight, setContainerHeight] = useState('auto');
-    const [touchStart, setTouchStart] = useState(null);
-    const [touchEnd, setTouchEnd] = useState(null);
+    
+    const [touchStart, setTouchStart] = useState(null); 
 
     const view1Ref = useRef(null);
     const view2Ref = useRef(null);
@@ -23,40 +23,37 @@ export function useSwipeViews(calendarMonths, isLoaded) {
         return () => { window.removeEventListener('resize', updateHeight); clearTimeout(timeout); };
     }, [activeView, calendarMonths, isLoaded]);
 
-    const onTouchStart = (e) => {
-        setTouchEnd(null);
-        setTouchStart(e.targetTouches[0].clientX);
+    const onTouchStart = (e) => { 
+        setTouchStart(e.targetTouches[0].clientX); 
     };
+    
 
-    const onTouchMove = (e) => {
-        setTouchEnd(e.targetTouches[0].clientX);
-    };
-
-    const onTouchEnd = () => {
-        if (!touchStart || !touchEnd) return;
-        const distance = touchStart - touchEnd;
-
+    const onTouchEnd = (e) => {
+        if (!touchStart) return;
+        
+        const currentTouchEnd = e.changedTouches[0].clientX;
+        const distance = touchStart - currentTouchEnd;
+        
         if (distance > MIN_SWIPE_DISTANCE && activeView < 2) {
             setActiveView((prev) => prev + 1);
         } else if (distance < -MIN_SWIPE_DISTANCE && activeView > 0) {
             setActiveView((prev) => prev - 1);
         }
-
+        
         setTouchStart(null);
-        setTouchEnd(null);
     };
 
-    return {
-        activeView,
-        setActiveView,
-        containerHeight,
-        view1Ref,
-        view2Ref,
-        view3Ref,
+    return { 
+        activeView, 
+        setActiveView, 
+        containerHeight, 
+        view1Ref, 
+        view2Ref, 
+        view3Ref, 
         swipeHandlers: {
             onTouchStart,
-            onTouchMove,
-            onTouchEnd
+            onTouchEnd,
+            onTouchCancel: () => setTouchStart(null)
         }
     };
 }
