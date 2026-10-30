@@ -23,14 +23,40 @@ export function useSwipeViews(calendarMonths, isLoaded) {
         return () => { window.removeEventListener('resize', updateHeight); clearTimeout(timeout); };
     }, [activeView, calendarMonths, isLoaded]);
 
-    const onTouchStart = (e) => { setTouchEnd(null); setTouchStart(e.targetTouches[0].clientX); };
-    const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+    const onTouchStart = (e) => {
+        setTouchEnd(null);
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e) => {
+        setTouchEnd(e.targetTouches[0].clientX);
+    };
+
     const onTouchEnd = () => {
         if (!touchStart || !touchEnd) return;
         const distance = touchStart - touchEnd;
-        if (distance > MIN_SWIPE_DISTANCE && activeView < 2) setActiveView((prev) => prev + 1);
-        if (distance < -MIN_SWIPE_DISTANCE && activeView > 0) setActiveView((prev) => prev - 1);
+
+        if (distance > MIN_SWIPE_DISTANCE && activeView < 2) {
+            setActiveView((prev) => prev + 1);
+        } else if (distance < -MIN_SWIPE_DISTANCE && activeView > 0) {
+            setActiveView((prev) => prev - 1);
+        }
+
+        setTouchStart(null);
+        setTouchEnd(null);
     };
 
-    return { activeView, setActiveView, containerHeight, view1Ref, view2Ref, view3Ref, onTouchStart, onTouchMove, onTouchEnd };
+    return {
+        activeView,
+        setActiveView,
+        containerHeight,
+        view1Ref,
+        view2Ref,
+        view3Ref,
+        swipeHandlers: {
+            onTouchStart,
+            onTouchMove,
+            onTouchEnd
+        }
+    };
 }
